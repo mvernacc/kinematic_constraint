@@ -1,0 +1,37 @@
+name: actions
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_and_test:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: curl -sSL https://install.python-poetry.org | python - --version 1.8.3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
+          cache-dependency-path: |
+            **poetry.lock
+
+      - name: Setup
+        run: poetry install
+      
+      - name: Lint
+        run: poetry run pre-commit run --show-diff-on-failure --all-files
+      
+      - name: Test
+        run: poetry run pytest

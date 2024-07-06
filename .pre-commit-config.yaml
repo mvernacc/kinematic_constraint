@@ -1,0 +1,26 @@
+files: ^tensegrity_force_balance/|^tests/
+repos:
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: ruff check . --fix
+        types: [python]
+        language: system
+        require_serial: true
+  - repo: local
+    hooks:
+      - id: format
+        name: format
+        entry: ruff format .
+        types: [python]
+        language: system
+        require_serial: true
+  - repo: local
+    hooks:
+      - id: check_static_typing
+        name: check_static_typing
+        entry: pyright .
+        types: [python]
+        language: system
+        require_serial: true
