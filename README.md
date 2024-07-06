@@ -25,7 +25,8 @@ This python script calculates and visualizes its degrees of freedom:
 DoF(translation=None, rotation=Rotation(point=(-0.0, 0.0, -0.0), direction=(-1.0, 0.0, 0.0)), pitch=None)
 DoF(translation=(0.0, 0.0, 1.0), rotation=None, pitch=None)
 
->>> draw(constraints, dofs)
+>>> draw(constraints, dofs)  # doctest: +ELLIPSIS
+<Figure ... with 4 Axes>
 >>> plt.show()  # doctest: +SKIP
 
 ```
