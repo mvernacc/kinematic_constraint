@@ -16,6 +16,9 @@ pyright = "^1.1.368"
 pytest = "^8.2.2"
 pre-commit = "^3.7.1"
 
+[tool.pytest.ini_options]
+addopts = "--doctest-glob=\"*.md\""
+
 [tool.ruff]
 line-length = 100
 
