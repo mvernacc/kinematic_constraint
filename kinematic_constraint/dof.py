@@ -199,7 +199,7 @@ def calc_dofs(constraints: list[Constraint], simplify: bool = True) -> list[DoF]
 
     # Each constraint removes at most 1 degree of freedom.
     n_dof = basis.shape[1]
-    assert n_dof >= 3 - n_constraints
+    assert n_dof >= 6 - n_constraints
 
     angle_epsilon = 1e-9  # [radian]
     max_dist = _max_distance_between_points(constraints)
