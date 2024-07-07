@@ -52,15 +52,42 @@ Hopefully, this makes the method of exact constraint easier to use in mechanical
 
 The degrees of freedom are calculated from the null space of a constraint matrix, as described in [math.md](math.md).
 
-The method is tested on every example from Figure 2-21 of Hale 1999:
+The algorithm is tested on every example from Figure 2-21 of Hale 1999 (see `test_hale_2_21` in `tests/test_dof.py`):
 
 ![Hale 1999, Figure 2-21](figures/hale1999_fig_2-21.png)
 
-The method also handles helical degrees of freedom, e.g. like this
-arrangement from Figure 2-25 of Hale 1999:
+The algorithm also handles constraint sets with helical degrees of freedom,
+like this arrangement from Figure 2-25 of Hale 1999:
 
 ![Hale 1999, Figure 2-25](figures/hale1999_fig_2-25.png)
 
+The python snippet below creates the arrangement of three skew constraints from the figure
+(but with an angle to the z axis of 45 degrees). It then checks that these constraints
+allow a helical rotation and translation about the $z$ axis with a pitch of 0.1 length units per radian.
+
+```pycon
+>>> import numpy as np
+>>> from kinematic_constraint import Constraint, DoF, Rotation, constraints_allow_dof
+>>> x0 = 1.0; y0 = 0.1
+>>> constraints = []
+>>> for theta in [0.0, 2 / 3 * np.pi, 4 / 3 * np.pi]:
+...     constraints.append(
+...         Constraint(
+...             point=(
+...                 x0 * np.cos(theta) - y0 * np.sin(theta),
+...                 x0 * np.sin(theta) + y0 * np.cos(theta),
+...                 0,
+...             ),
+...             direction=(np.cos(theta), np.sin(theta), 1),
+...         )
+...     )
+>>> constraints_allow_dof(
+...     constraints,
+...     DoF(translation=(0, 0, 1), rotation=Rotation((0, 0, 0), (0, 0, 1)), pitch=0.1),
+... )
+True
+
+```
 
 ## References
 
