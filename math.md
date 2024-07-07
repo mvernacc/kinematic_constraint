@@ -1,4 +1,5 @@
-This note describes a method to find the degrees of freedom of a constrained 3d rigid body
+This note describes a method to find (a [basis](https://en.wikipedia.org/wiki/Basis_(linear_algebra)) for)
+the degrees of freedom of a constrained 3d rigid body
 using the [null space](https://en.wikipedia.org/wiki/Kernel_(linear_algebra)) of a constraint matrix.
 The constraints are modeled as rigid lines connected to points on the body,
 as described in the literature of kinematic / exact constraint (e.g. Blanding 1999, Hale 1999).

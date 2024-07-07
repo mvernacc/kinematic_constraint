@@ -14,14 +14,14 @@ This python script calculates and visualizes its degrees of freedom:
 
 ```pycon
 >>> from matplotlib import pyplot as plt
->>> from kinematic_constraint import Constraint, calc_dofs, draw
+>>> from kinematic_constraint import Constraint, calc_dofs_basis, draw
 >>> constraints = [
 ...     Constraint(point=(1, 1, 1), direction=(-1, 0, 0)),
 ...     Constraint(point=(1, 1, -1), direction=(-1, 0, 0)),
 ...     Constraint(point=(1, -1, -1), direction=(-1, 0, 0)),
 ...     Constraint(point=(0, -1, 0), direction=(0, 1, 0)),
 ... ]
->>> dofs = calc_dofs(constraints)
+>>> dofs = calc_dofs_basis(constraints)
 >>> for dof in dofs:
 ...     print(dof)
 DoF(translation=None, rotation=Rotation(point=(-0.0, 0.0, -0.0), direction=(-1.0, 0.0, 0.0)), pitch=None)
@@ -49,6 +49,38 @@ This software can automatically detect the degrees of freedom, and visualize the
 with only a few lines of python.
 Hopefully, this makes the method of exact constraint easier to use in mechanical design.
 
+## Core concepts
+
+*Single rigid body* - This software models the motion of a single rigid body. However, the body may be supported via flexible elements like wires or [flexures](https://en.wikipedia.org/wiki/Flexure), which are modeled as constraints.
+
+*Constraint* - An ideal constraint line connects to a rigid body at a point,
+and prevents the connection point from moving along the direction of the constraint.
+This definition of a constraint is from Section 1.3 of Blanding 1999
+(see [references](#references)).
+An example realization of an ideal constraint would be a rod with ball joints on both ends, as in the figure below.
+Some connections like a ball-in-groove or a sheet flexure are modeled with multiple constraints; see Blanding 1999 to learn more.
+
+<img src="figures/blanding1999_fig2.3.4.png" alt="Blanding 1999, Figure 2.3.4" width="200"/>
+
+*Degree of freedom* - A degree of freedom is a direction of translation, or a line of rotation, about which the body can make small motions without compressing or extending any constraint.
+
+*Non-unique degrees of freedom* - In some cases, a body can be free to rotate or translate about an infinite "sub-space" of directions.
+For example, the body in the figure below is free to rotate about any line in
+the horizontal plane which passes through its top-right corner.
+See Blanding 1999 Chapter 3 for further examples of non-unique degrees of freedom.
+
+<img src="figures/blanding1999_fig3.4.1.png" alt="Blanding 1999, Figure 3.4.1" width="200"/>
+
+*Degree of freedom basis* - This software uses a degree-of-freedom [basis](https://en.wikipedia.org/wiki/Basis_(linear_algebra))
+to represent the space of degrees-of-freedom allowed by a constraint set.
+For example, in the above figure, the body has a degree-of-freedom space of dimension 2,
+and the rotations R1 and R2 are the space's basis vectors.
+Any linear combination of R1 and R2 is also an allowed rotation,
+e.g. rotation about any of the disk of thin lines drawn in the figure.
+
+Use the function `calc_dofs_basis(constraints)` to calculate the degree of freedom basis.
+
+Use the function `constraints_allow_dof(constraints, dof)` to check if a set of constraints allows a particular degree of freedom.
 
 ## How it works
 

@@ -12,7 +12,7 @@ from kinematic_constraint.dof import (
     get_rotation_translation_linear_operator,
     get_translation_linear_operator,
     use_common_point_for_intersecting_lines,
-    calc_dofs,
+    calc_dofs_basis,
     constraints_allow_dof,
 )
 from kinematic_constraint.linalg import basis_contains_vector
@@ -95,7 +95,7 @@ class TestUseCommonPointForIntersectingLines:
 
 class TestCalcDofs:
     def test_three_constraints_thru_origin(self):
-        dofs = calc_dofs(
+        dofs = calc_dofs_basis(
             [
                 Constraint((1, 0, 0), (1, 0, 0)),
                 Constraint((0, 1, 0), (0, 1, 0)),
@@ -115,7 +115,7 @@ class TestCalcDofs:
             Constraint((1, 1, 1), (0, 1, 0)),
             Constraint((1, 1, 1), (0, 0, 1)),
         ]
-        dofs = calc_dofs(constraints)
+        dofs = calc_dofs_basis(constraints)
         print(dofs)
         assert len(dofs) == 3
         for dof in dofs:
@@ -393,7 +393,7 @@ class TestCalcDofs:
         for constraint in constraints:
             print(str(constraint))
 
-        dofs = calc_dofs(constraints)
+        dofs = calc_dofs_basis(constraints)
         for dof in dofs:
             print(dof)
 
@@ -502,7 +502,7 @@ class TestCalcDofs:
         )
 
         # Action
-        dofs = calc_dofs(constraints)
+        dofs = calc_dofs_basis(constraints)
 
         # Verification
         assert len(dofs) == 1

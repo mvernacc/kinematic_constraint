@@ -80,13 +80,14 @@ class DoF:
         \\vec{dm} = [\\vec{r} \\, d\\theta, \\quad \\vec{t} \\, ds - \\vec{r} \\times \\vec{p} \\, d\\theta]
         $$
 
-        The magnitude of the 6-vector is arbitrarily set to $d\\theta = 1$.
+        The magnitude of the 6-vector is arbitrarily set to 1.
         """
         r = np.zeros(3) if self.rotation is None else self.rotation.direction
         p = np.zeros(3) if self.rotation is None else self.rotation.point
         t = np.zeros(3) if self.translation is None else self.translation
         pitch = 1.0 if self.pitch is None else self.pitch
-        return np.concatenate((r, pitch * t - np.cross(r, p)))
+        screw = np.concatenate((r, pitch * t - np.cross(r, p)))
+        return screw / np.linalg.norm(screw)
 
     def __str__(self) -> str:
         translation_str = (
@@ -145,8 +146,8 @@ def get_rotation_translation_linear_operator(constraints: list[Constraint]) -> N
     )
 
 
-def calc_dofs(constraints: list[Constraint], simplify: bool = True) -> list[DoF]:
-    """Calculate the translational and rotational degrees of freedom of a constrained rigid body.
+def calc_dofs_basis(constraints: list[Constraint], simplify: bool = True) -> list[DoF]:
+    """Calculate a basis for the translational and rotational degrees of freedom of a constrained rigid body.
 
     This function models a rigid body supported by point-contact "constraint lines",
     as defined in Blanding [1].
@@ -169,8 +170,7 @@ def calc_dofs(constraints: list[Constraint], simplify: bool = True) -> list[DoF]
     if len(constraints) == 1 or all(
         constraints[0].coincident(constraints[i]) for i in range(1, len(constraints))
     ):
-        print("special")
-        # Either there is only one constraint, or all the constraints are coincident.
+        # Special case: either there is only one constraint, or all the constraints are coincident.
         # In this case, there are 3 rotation DoFs and 2 translation DoFs.
         # The rotation DoFs are ambiguous, as they could be any three orthogonal lines which
         # all intersect the one constraint line.
@@ -194,17 +194,24 @@ def calc_dofs(constraints: list[Constraint], simplify: bool = True) -> list[DoF]
 
     linop_rt = get_rotation_translation_linear_operator(constraints)
 
+    # Calculate an orthonormal basis for the degrees of freedom as the null space of
+    # the linear operator that maps screw-like 6-vectors -> constraint length changes.
+    # The null space contains the differential motion 6-vectors which
+    # result in zero constraint length change, meaning those motions
+    # are allowed by the constraints.
     basis = null_space(linop_rt)
-    assert basis.shape[0] == 6
 
-    # Each constraint removes at most 1 degree of freedom.
+    assert basis.shape[0] == 6
     n_dof = basis.shape[1]
+    # Each constraint removes at most 1 degree of freedom.
     assert n_dof >= 6 - n_constraints
 
+    # Interpret the screw-like 6-vectors of the basis into easier-to-read DoF objects.
+    # First, choose negligibly small values of length and angle. These are used below instead
+    # of comparing to zero to allow for numerical error in the calculation of the basis vectors.
     angle_epsilon = 1e-9  # [radian]
     max_dist = _max_distance_between_points(constraints)
     length_epsilon = 1e-9 if max_dist == 0.0 else 1e-9 * max_dist  # [length units]
-
     dofs = []
     for i in range(n_dof):
         col = basis[:, i]
@@ -246,7 +253,12 @@ def constraints_allow_dof(constraints: list[Constraint], dof: DoF) -> bool:
     """Check if a set of constraints allow (infinitesimal) motion of along a degree of freedom."""
     linop_rt = get_rotation_translation_linear_operator(constraints)
     dlengths = linop_rt @ dof.to_screw()
-    length_epsilon = 1e-9 * _max_distance_between_points(constraints)
+
+    # Calculate a length scale that is small compared to the distance between the constraint points.
+    max_dist = _max_distance_between_points(constraints)
+    length_epsilon = 1e-9 if max_dist == 0.0 else 1e-9 * max_dist  # [length units]
+
+    # Compare the `dlengths` to zero while allowing for some numerical error.
     return bool(np.all(np.abs(dlengths) < length_epsilon))
 
 
