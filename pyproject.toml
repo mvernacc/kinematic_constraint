@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "kinematic-constraint"
-version = "0.1.0"
+version = "0.1.1"
 description = "Solver for rigid body degrees of freedom with the theory of kinematic constraint (aka exact constraint)."
 authors = ["Matthew Vernacchia <mvernacc@mit.edu>"]
 readme = "README.md"
+repository = "https://github.com/mvernacc/kinematic_constraint"
 
 [tool.poetry.dependencies]
 python = "^3.11"
