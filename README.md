@@ -1,6 +1,7 @@
 # Kinematic Constraint
 
 ![CI status badge](https://github.com/mvernacc/kinematic_constraint/actions/workflows/actions.yml/badge.svg?branch=main)
+[![PyPI - Version](https://img.shields.io/pypi/v/kinematic_constraint)](https://pypi.org/project/kinematic-constraint/)
 
 Solve for rigid body degrees of freedom with the theory of kinematic constraint (aka exact constraint).
 
