@@ -1,5 +1,7 @@
 # Kinematic Constraint
 
+![CI status badge](https://github.com/mvernacc/kinematic_constraint/actions/workflows/actions.yml/badge.svg?branch=main)
+
 Solve for rigid body degrees of freedom with the theory of kinematic constraint (aka exact constraint).
 
 For example, the cube below is connected to four constraints (show by thick black lines with dots).
